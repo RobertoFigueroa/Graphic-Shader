@@ -4,15 +4,20 @@ from obj import Obj
 
 from texture import Texture
 
+from shaders import gourad, toon
+
 from utils import color
 
-my_bmp_file = Render()
-my_bmp_file.glInit()
-my_bmp_file.glCreateWindow(1000,1000)
-my_bmp_file.glClear()
+r = Render()
+r.glCreateWindow(1000,1000)
+r.glClear()
 
-my_bmp_file.active_texture = Texture('./models/heli.bmp')
-my_bmp_file.loadModel('./models/heli.obj', V3(500,500,0), V3(5,5,5))
+r.active_texture = Texture('./models/model.bmp')
+r.active_shader = toon
+
+#r.light = V3(1,0,0)
+
+r.loadModel('./models/model.obj', V3(500,500,0), V3(300,300,300))
 
 
-my_bmp_file.glFinish('outs.bmp')
+r.glFinish('output.bmp')

@@ -256,8 +256,6 @@ class Render(object):
 	def loadModel(self, filename, translate=V3(0,0,0), scale=V3(1,1,1), isWireframe = False):
 		model = Obj(filename)
 
-		light = V3(0,0,1)
-
 		for face in model.faces:
 
 			vertCount = len(face)
@@ -301,11 +299,17 @@ class Render(object):
 					vt0 = V2(0,0) 
 					vt1 = V2(0,0) 
 					vt2 = V2(0,0) 
-					vt3 = V2(0,0) 
+					vt3 = V2(0,0)
+				
+				vn0 = model.normals[face[0][2] - 1]
+				vn1 = model.normals[face[1][2] - 1]
+				vn2 = model.normals[face[2][2] - 1]
+				if vertCount > 3:
+					vn3 = model.normals[face[3][2] -1]
 
-				self.triangle_bc(v0,v1,v2, texcoords = (vt0,vt1,vt2))
+				self.triangle_bc(v0,v1,v2, texcoords = (vt0,vt1,vt2), normals= (vn0, vn1, vn2))
 				if vertCount > 3: #asumamos que 4, un cuadrado
-					self.triangle_bc(v0,v2,v3, texcoords = (vt0,vt2,vt3))
+					self.triangle_bc(v0,v2,v3, texcoords = (vt0,vt2,vt3), normals=(vn1, vn2, vn3))
 
 	def drawPolygons(self, points):
 		
@@ -439,7 +443,7 @@ class Render(object):
 			flatTopTriangle(A,B,D)
 
     #Barycentric Coordinates
-	def triangle_bc(self, A, B, C, _color = WHITE, texcoords = ()):
+	def triangle_bc(self, A, B, C, texcoords = (), normals = (), _color = None):
 		#bounding box
 		minX = min(A.x, B.x, C.x)
 		minY = min(A.y, B.y, C.y)
@@ -458,21 +462,12 @@ class Render(object):
 					z = A.z * u + B.z * v + C.z * w
 					if z > self.zbuffer[y][x]:
 						
-						b, g , r = _color
-						b /= 255
-						g /= 255
-						r /= 255
-
-
-						if self.active_texture:
-							ta, tb, tc = texcoords
-							tx = ta.x * u + tb.x * v + tc.x * w
-							ty = ta.y * u + tb.y * v + tc.y * w
-
-							texColor = self.active_texture.getColor(tx, ty)
-							b *= texColor[0] / 255
-							g *= texColor[1] / 255
-							r *= texColor[2] / 255
+						r, g, b = self.active_shader(
+							self,
+							baryCoords=(u,v,w),
+							texCoords = texcoords,
+							normals = normals,
+							color= _color or self.curr_color)
 
 						self.glVertex_coord(x, y, color(r,g,b))
 						self.zbuffer[y][x] = z
