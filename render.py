@@ -462,6 +462,7 @@ class Render(object):
 					z = A.z * u + B.z * v + C.z * w
 					if z > self.zbuffer[y][x]:
 						
+						
 						r, g, b = self.active_shader(
 							self,
 							baryCoords=(u,v,w),

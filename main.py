@@ -4,7 +4,7 @@ from obj import Obj
 
 from texture import Texture
 
-from shaders import gourad, toon
+from shaders import gourad, toon, outline, toon_mod
 
 from utils import color
 
@@ -17,7 +17,15 @@ r.active_shader = toon
 
 #r.light = V3(1,0,0)
 
-r.loadModel('./models/model.obj', V3(500,500,0), V3(300,300,300))
+r.loadModel('./models/model.obj', V3(250,500,0), V3(150,150,150))
+
+r.active_shader = outline
+
+r.loadModel('./models/model.obj', V3(500,500,0), V3(150,150,150))
+
+r.active_shader = toon_mod
+
+r.loadModel('./models/model.obj', V3(750,500,0), V3(150,150,150))
 
 
-r.glFinish('output.bmp')
+r.glFinish('output2.bmp')
